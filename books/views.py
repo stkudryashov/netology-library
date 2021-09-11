@@ -14,12 +14,14 @@ def books_view(request, value=None):
     context = dict()
 
     if value:
-        books = Book.objects.all()
+        pub_dates = set(Book.objects.all().values_list('pub_date', flat=True))
+        pub_dates = sorted([i.strftime('%Y-%m-%d') for i in pub_dates])
 
-        paginator = Paginator(books, 1)
-        page = paginator.get_page(1)
+        paginator = Paginator(pub_dates, 1)
+        page = paginator.get_page(pub_dates.index(value) + 1)
 
-        context['books'] = books
+        context['books'] = Book.objects.filter(pub_date=value)
+        context['page_obj'] = page
     else:
         context['books'] = Book.objects.all()
 
